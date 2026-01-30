@@ -206,7 +206,13 @@ fun CartScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Shopping Cart", fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        "Mon Panier",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -219,7 +225,8 @@ fun CartScreen(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White,
                     navigationIconContentColor = Color.White
-                )
+                ),
+                modifier = Modifier.height(64.dp)
             )
         }
     ) { paddingValues ->
@@ -240,19 +247,28 @@ fun CartScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Your cart is empty",
+                        text = "Votre panier est vide",
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1E293B)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Add some products to get started",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = TextSecondary
+                        text = "Ajoutez des produits pour commencer",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color(0xFF64748B)
                     )
                     Spacer(modifier = Modifier.height(24.dp))
-                    Button(onClick = onBackClick) {
-                        Text("Start Shopping")
+                    Button(
+                        onClick = onBackClick,
+                        modifier = Modifier.height(48.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            "Commencer mes achats",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
                 }
             }
@@ -282,76 +298,112 @@ fun CartScreen(
                     }
                 }
 
-                // Cart Summary
+                // Cart Summary - Modern Design
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
-                    shadowElevation = 8.dp,
+                    shadowElevation = 12.dp,
                     color = Color.White
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(20.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                        // Summary Card
+                        Surface(
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color(0xFFF8FAFC),
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(
-                                text = "Subtotal",
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Text(
-                                text = "$${String.format("%.2f", totalPrice)}",
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
+                            Column(
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = "Sous-total",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = Color(0xFF64748B)
+                                    )
+                                    Text(
+                                        text = "$${String.format("%.2f", totalPrice)}",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = Color(0xFF1E293B)
+                                    )
+                                }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(10.dp))
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "Shipping",
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-                            Text(
-                                text = "Free",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = SuccessGreen,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        text = "Livraison",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = Color(0xFF64748B)
+                                    )
+                                    Surface(
+                                        shape = RoundedCornerShape(6.dp),
+                                        color = Color(0xFF10B981)
+                                    ) {
+                                        Text(
+                                            text = "GRATUIT",
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
 
-                        Divider(modifier = Modifier.padding(vertical = 12.dp))
+                                Divider(
+                                    modifier = Modifier.padding(vertical = 14.dp),
+                                    color = Color(0xFFE2E8F0),
+                                    thickness = 2.dp
+                                )
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "Total",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = "$${String.format("%.2f", totalPrice)}",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "Total",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF1E293B)
+                                    )
+                                    Text(
+                                        text = "$${String.format("%.2f", totalPrice)}",
+                                        style = MaterialTheme.typography.headlineSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF0066FF)
+                                    )
+                                }
+                            }
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Button(
                             onClick = { showConfirmOrderDialog = true },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF0066FF)
+                            ),
+                            shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Passer la commande")
+                            Text(
+                                "Passer la commande",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }
@@ -421,20 +473,29 @@ fun CartItemCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White)
-                .padding(12.dp)
+                .padding(14.dp)
         ) {
-            // Product Image
+            // Product Image with gradient background
             Box(
                 modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFF5F5F5))
+                    .size(90.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(
+                        androidx.compose.ui.graphics.Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xFFF8FAFC),
+                                Color(0xFFE2E8F0)
+                            )
+                        )
+                    )
             ) {
                 AsyncImage(
                     model = cartItem.product.image,
@@ -459,16 +520,26 @@ fun CartItemCard(
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color(0xFF1E293B)
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = "$${String.format("%.2f", cartItem.product.price)}",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF0066FF)
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "$${String.format("%.2f", cartItem.product.price)}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    text = "Total: $${String.format("%.2f", cartItem.totalPrice)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF64748B),
+                    fontWeight = FontWeight.Medium
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -477,40 +548,49 @@ fun CartItemCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Quantity Controls
+                    // Quantity Controls - Modern Design
                     Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant
+                        shape = RoundedCornerShape(10.dp),
+                        color = Color(0xFFF1F5F9),
+                        shadowElevation = 1.dp
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             IconButton(
                                 onClick = { onQuantityChange(cartItem.quantity - 1) },
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(36.dp)
                             ) {
                                 Text(
                                     text = "−",
                                     style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF0066FF)
                                 )
                             }
 
-                            Text(
-                                text = cartItem.quantity.toString(),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 8.dp)
-                            )
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = Color.White
+                            ) {
+                                Text(
+                                    text = cartItem.quantity.toString(),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                    color = Color(0xFF1E293B)
+                                )
+                            }
 
                             IconButton(
                                 onClick = { onQuantityChange(cartItem.quantity + 1) },
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(36.dp)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Add,
                                     contentDescription = "Increase",
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(18.dp),
+                                    tint = Color(0xFF0066FF)
                                 )
                             }
                         }

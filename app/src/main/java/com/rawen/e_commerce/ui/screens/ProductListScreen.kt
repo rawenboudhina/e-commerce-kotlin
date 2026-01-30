@@ -25,12 +25,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -67,11 +69,31 @@ fun ProductListScreen(
 ) {
     val uiState by productViewModel.uiState.collectAsState()
     val cartItemCount by cartViewModel.itemCount.collectAsState()
+    val selectedCategory by productViewModel.selectedCategory.collectAsState()
+
+    val categories = listOf(
+        "Tous" to null,
+        "Électronique" to "electronics",
+        "Bijoux" to "jewelery",
+        "Homme" to "men's clothing",
+        "Femme" to "women's clothing"
+    )
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("E-Commerce", fontWeight = FontWeight.Bold) },
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            "My TechZone",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+                },
                 actions = {
                     BadgedBox(
                         badge = {
@@ -97,16 +119,50 @@ fun ProductListScreen(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White,
                     actionIconContentColor = Color.White
-                )
+                ),
+                modifier = Modifier.height(72.dp)
             )
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            when (val state = uiState) {
+            // Category Filters
+            androidx.compose.foundation.lazy.LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.White)
+                    .padding(horizontal = 12.dp, vertical = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(categories.size) { index ->
+                    val (label, category) = categories[index]
+                    val isSelected = if (category == null) selectedCategory == null else selectedCategory == category
+
+                    FilterChip(
+                        label = label,
+                        isSelected = isSelected,
+                        onClick = {
+                            if (category == null) {
+                                productViewModel.clearCategoryFilter()
+                            } else {
+                                productViewModel.loadProductsByCategory(category)
+                            }
+                        }
+                    )
+                }
+            }
+
+            Divider(color = Color(0xFFE2E8F0), thickness = 1.dp)
+            // Content
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+            ) {
+                when (val state = uiState) {
                 is ProductUiState.Loading -> {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center)
@@ -138,6 +194,32 @@ fun ProductListScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun FilterChip(
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(20.dp),
+        color = if (isSelected) Color(0xFF0066FF) else Color(0xFFF1F5F9),
+        modifier = Modifier.height(40.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                color = if (isSelected) Color.White else Color(0xFF64748B)
+            )
         }
     }
 }
@@ -176,27 +258,35 @@ fun ProductCard(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(12.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        )
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
+            modifier = Modifier.fillMaxWidth()
         ) {
-            // Product Image
+            // Product Image with gradient overlay
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
-                    .background(Color(0xFFF5F5F5))
+                    .height(160.dp)
+                    .background(
+                        androidx.compose.ui.graphics.Brush.verticalGradient(
+                            colors = listOf(
+                                Color(0xFFF8FAFC),
+                                Color(0xFFE2E8F0)
+                            )
+                        )
+                    )
             ) {
                 AsyncImage(
                     model = product.image,
                     contentDescription = product.title,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(8.dp),
+                        .padding(12.dp),
                     contentScale = ContentScale.Fit
                 )
             }
@@ -205,56 +295,96 @@ fun ProductCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp)
+                    .padding(14.dp)
             ) {
+                // Category chip
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = Color(0xFFEFF6FF),
+                    modifier = Modifier.padding(bottom = 6.dp)
+                ) {
+                    Text(
+                        text = product.category.uppercase(),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFF0066FF),
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
                 Text(
                     text = product.title,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.height(40.dp)
+                    modifier = Modifier.height(42.dp),
+                    color = Color(0xFF1E293B)
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "⭐ ${product.rating.rate}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary
-                    )
+                    repeat(5) { index ->
+                        Text(
+                            text = if (index < product.rating.rate.toInt()) "★" else "☆",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (index < product.rating.rate.toInt()) Color(0xFFFBBF24) else Color(0xFFE2E8F0)
+                        )
+                    }
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "(${product.rating.count})",
+                        text = "${product.rating.rate}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary
+                        color = Color(0xFF64748B),
+                        fontWeight = FontWeight.Medium
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "$${String.format("%.2f", product.price)}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    Column {
+                        Text(
+                            text = "$${String.format("%.2f", product.price)}",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF0066FF),
+
+
+                        )
+                    }
 
                     if (showAddedMessage) {
-                        Text(
-                            text = "✓ Added",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = SuccessGreen,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = Color(0xFF10B981)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "✓",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = "",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
                         LaunchedEffect(Unit) {
                             kotlinx.coroutines.delay(1500)
                             showAddedMessage = false
@@ -265,12 +395,16 @@ fun ProductCard(
                                 onAddToCart()
                                 showAddedMessage = true
                             },
-                            modifier = Modifier.height(32.dp),
-                            contentPadding = PaddingValues(horizontal = 12.dp)
+                            modifier = Modifier.height(25.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp),
+
+
+                            shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
                                 text = "Add",
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
                     }

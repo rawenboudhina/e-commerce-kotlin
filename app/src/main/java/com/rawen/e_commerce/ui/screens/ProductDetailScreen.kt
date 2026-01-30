@@ -88,7 +88,13 @@ fun ProductDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Product Details", fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        "Détails du produit",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -101,7 +107,8 @@ fun ProductDetailScreen(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = Color.White,
                     navigationIconContentColor = Color.White
-                )
+                ),
+                modifier = Modifier.height(64.dp)
             )
         }
     ) { paddingValues ->
@@ -138,41 +145,76 @@ fun ProductDetailScreen(
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
                     ) {
-                        // Product Image
+                        // Product Image with modern gradient background
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(350.dp)
-                                .background(Color.White)
+                                .height(380.dp)
+                                .background(
+                                    androidx.compose.ui.graphics.Brush.verticalGradient(
+                                        colors = listOf(
+                                            Color(0xFFF8FAFC),
+                                            Color(0xFFFFFFFF)
+                                        )
+                                    )
+                                )
                         ) {
                             AsyncImage(
                                 model = product!!.image,
                                 contentDescription = product!!.title,
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(24.dp),
+                                    .padding(32.dp),
                                 contentScale = ContentScale.Fit
                             )
+
+                            // Rating badge overlay
+                            Surface(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .align(Alignment.TopEnd),
+                                shape = RoundedCornerShape(12.dp),
+                                color = Color(0xFF0066FF),
+                                shadowElevation = 4.dp
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "⭐",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "${product!!.rating.rate}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                }
+                            }
                         }
 
-                        // Product Information
+                        // Product Information with modern card design
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .background(Color.White)
-                                .padding(16.dp)
+                                .padding(20.dp)
                         ) {
                             // Category Badge
                             Surface(
-                                shape = RoundedCornerShape(16.dp),
-                                color = MaterialTheme.colorScheme.primaryContainer,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                shape = RoundedCornerShape(10.dp),
+                                color = Color(0xFFEFF6FF),
+                                modifier = Modifier.padding(bottom = 12.dp)
                             ) {
                                 Text(
                                     text = product!!.category.uppercase(),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    style = MaterialTheme.typography.labelMedium,
+                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp),
+                                    color = Color(0xFF0066FF),
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
 
@@ -181,86 +223,138 @@ fun ProductDetailScreen(
                                 text = product!!.title,
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                modifier = Modifier.padding(bottom = 12.dp),
+                                color = Color(0xFF1E293B)
                             )
 
-                            // Rating
+                            // Rating with stars
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(bottom = 16.dp)
+                                modifier = Modifier.padding(bottom = 20.dp)
                             ) {
-                                Text(
-                                    text = "⭐ ${product!!.rating.rate}",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = FontWeight.SemiBold
-                                )
+                                repeat(5) { index ->
+                                    Text(
+                                        text = if (index < product!!.rating.rate.toInt()) "★" else "☆",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = if (index < product!!.rating.rate.toInt()) Color(0xFFFBBF24) else Color(0xFFE2E8F0)
+                                    )
+                                }
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "(${product!!.rating.count} reviews)",
+                                    text = "${product!!.rating.rate}",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF1E293B)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "(${product!!.rating.count} avis)",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = TextSecondary
+                                    color = Color(0xFF64748B)
                                 )
                             }
 
-                            // Price
-                            Text(
-                                text = "$${String.format("%.2f", product!!.price)}",
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(bottom = 16.dp)
-                            )
+                            // Price with modern styling
+                            Surface(
+                                shape = RoundedCornerShape(12.dp),
+                                color = Color(0xFFEFF6FF),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 20.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(16.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = "Prix",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = Color(0xFF64748B)
+                                        )
+                                        Text(
+                                            text = "$${String.format("%.2f", product!!.price)}",
+                                            style = MaterialTheme.typography.headlineMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF0066FF)
+                                        )
+                                    }
+                                    Surface(
+                                        shape = RoundedCornerShape(8.dp),
+                                        color = Color(0xFF10B981)
+                                    ) {
+                                        Text(
+                                            text = "En stock",
+                                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                            style = MaterialTheme.typography.labelMedium,
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
+                                }
+                            }
 
-                            Divider(modifier = Modifier.padding(vertical = 16.dp))
+                            Divider(
+                                modifier = Modifier.padding(vertical = 16.dp),
+                                color = Color(0xFFE2E8F0)
+                            )
 
                             // Description
                             Text(
                                 text = "Description",
-                                style = MaterialTheme.typography.titleMedium,
+                                style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(bottom = 8.dp)
+                                modifier = Modifier.padding(bottom = 12.dp),
+                                color = Color(0xFF1E293B)
                             )
 
                             Text(
                                 text = product!!.description,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = TextSecondary,
-                                lineHeight = MaterialTheme.typography.bodyMedium.lineHeight.times(1.5f)
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color(0xFF475569),
+                                lineHeight = MaterialTheme.typography.bodyLarge.lineHeight.times(1.6f)
                             )
 
-                            Spacer(modifier = Modifier.height(100.dp))
+                            Spacer(modifier = Modifier.height(120.dp))
                         }
                     }
 
-                    // Add to Cart Button (Fixed at bottom)
+                    // Add to Cart Button (Fixed at bottom) - Modern Design
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.BottomCenter),
-                        shadowElevation = 8.dp,
+                        shadowElevation = 12.dp,
                         color = Color.White
                     ) {
-                        Row(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                .padding(20.dp)
                         ) {
                             if (showAddedMessage) {
                                 Button(
                                     onClick = { },
-                                    modifier = Modifier.fillMaxWidth(),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(56.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = SuccessGreen
-                                    )
+                                        containerColor = Color(0xFF10B981)
+                                    ),
+                                    shape = RoundedCornerShape(12.dp)
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.ShoppingCart,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(20.dp)
+                                    Text(
+                                        text = "✓",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Bold
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Added to Cart ✓")
+                                    Text(
+                                        "Ajouté au panier",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
                                 }
                                 LaunchedEffect(Unit) {
                                     kotlinx.coroutines.delay(2000)
@@ -274,15 +368,25 @@ fun ProductDetailScreen(
                                             showAddedMessage = true
                                         }
                                     },
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(56.dp),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color(0xFF0066FF)
+                                    ),
+                                    shape = RoundedCornerShape(12.dp)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.ShoppingCart,
                                         contentDescription = null,
-                                        modifier = Modifier.size(20.dp)
+                                        modifier = Modifier.size(22.dp)
                                     )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Add to Cart")
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(
+                                        "Ajouter au panier",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
                                 }
                             }
                         }
