@@ -29,6 +29,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -68,6 +71,7 @@ fun ProductDetailScreen(
     var error by remember { mutableStateOf<String?>(null) }
     var showAddedMessage by remember { mutableStateOf(false) }
 
+    val snackbarHostState = remember { SnackbarHostState() }
     val repository = remember { ProductRepository() }
     val scope = rememberCoroutineScope()
 
@@ -89,6 +93,17 @@ fun ProductDetailScreen(
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = Color(0xFF10B981),
+                    contentColor = Color.White,
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -506,6 +521,12 @@ fun ProductDetailScreen(
                                                 product?.let {
                                                     cartViewModel.addToCart(it)
                                                     showAddedMessage = true
+                                                    scope.launch {
+                                                        snackbarHostState.showSnackbar(
+                                                            message = "✓ Produit ajouté au panier avec succès !",
+                                                            duration = androidx.compose.material3.SnackbarDuration.Short
+                                                        )
+                                                    }
                                                 }
                                             },
                                             modifier = Modifier

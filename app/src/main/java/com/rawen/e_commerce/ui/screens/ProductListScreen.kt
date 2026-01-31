@@ -38,6 +38,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -48,6 +51,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,6 +70,7 @@ import com.rawen.e_commerce.data.model.Product
 import com.rawen.e_commerce.ui.viewmodel.CartViewModel
 import com.rawen.e_commerce.ui.viewmodel.ProductUiState
 import com.rawen.e_commerce.ui.viewmodel.ProductViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,6 +84,9 @@ fun ProductListScreen(
     val cartItemCount by cartViewModel.itemCount.collectAsState()
     val selectedCategory by productViewModel.selectedCategory.collectAsState()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     val categories = listOf(
         "Tous" to null,
         "Électronique" to "electronics",
@@ -88,6 +96,17 @@ fun ProductListScreen(
     )
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = Color(0xFF10B981),
+                    contentColor = Color.White,
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -219,6 +238,12 @@ fun ProductListScreen(
                                 onProductClick = onProductClick,
                                 onAddToCart = { product ->
                                     cartViewModel.addToCart(product)
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "✓ ${product.title.take(30)} ajouté au panier !",
+                                            duration = androidx.compose.material3.SnackbarDuration.Short
+                                        )
+                                    }
                                 }
                             )
                         }
